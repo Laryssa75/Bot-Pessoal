@@ -6,6 +6,43 @@
   <title>Teste de Static</title>
 </head>
 <body>
-  <h1>Funcionando!</h1>
+  <h1>Servidor express funcinondo com whatsapp web.js!</h1>
+</body>
+</html>
+
+
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <title>Bot WhatsApp</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <h1>🤖 Bot WhatsApp</h1>
+  <div id="status">Conectando...</div>
+  
+  <div id="qr-section">
+    <p>Escaneie o QR Code:</p>
+    <img id="qrcode" alt="QR Code do WhatsApp">
+  </div>
+
+  <hr>
+
+  <form id="message-form" enctype="multipart/form-data">
+    <label for="numeros">Números (separados por vírgula):</label>
+    <input type="text" name="numeros" required placeholder="Ex: 5599999999999,5588888888888"><br>
+
+    <label for="mensagem">Mensagem:</label>
+    <textarea name="mensagem" required></textarea><br>
+
+    <label for="imagem">Imagem (opcional):</label>
+    <input type="file" name="imagem" accept="image/*"><br>
+
+    <button type="submit">Enviar Mensagem</button>
+  </form>
+
+  <script src="/socket.io/socket.io.js"></script>
+  <script src="script.js"></script>
 </body>
 </html>

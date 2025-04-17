@@ -1,0 +1,55 @@
+body {
+    font-family: Arial, sans-serif;
+    padding: 20px;
+    background-color: #f4f4f4;
+    color: #333;
+    max-width: 600px;
+    margin: auto;
+  }
+  
+  h1 {
+    text-align: center;
+  }
+  
+  #qr-section {
+    text-align: center;
+    margin: 20px 0;
+  }
+  
+  form {
+    background: white;
+    padding: 15px;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0,0,0,0.1);
+  }
+  
+  form label {
+    display: block;
+    margin-top: 10px;
+  }
+  
+  form input[type="text"],
+  form textarea {
+    width: 100%;
+    padding: 8px;
+    margin-top: 5px;
+  }
+  
+  form input[type="file"] {
+    margin-top: 5px;
+  }
+  
+  form button {
+    margin-top: 15px;
+    padding: 10px 20px;
+    background-color: #128C7E;
+    border: none;
+    color: white;
+    border-radius: 5px;
+    cursor: pointer;
+  }
+  
+  form button:hover {
+    background-color: #075E54;
+  }
+  
