@@ -21,7 +21,7 @@ form.addEventListener('submit', async e => {
   e.preventDefault();
   const formData = new FormData(form);
 
-  const res = await fetch('/send', {
+  const res = await fetch('/api/send', {
     method: 'POST',
     body: formData
   });
