@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const multer = require('multer');
-const { sendMessageHandler } = require('../controllers/messageController');
+const { sendMessageHandler, getGrupoHandle } = require('../controllers/messageController');
 
 // Configuração do multer
 const storage = multer.diskStorage({
@@ -12,5 +12,6 @@ const upload = multer({ storage });
 
 // Aqui só redireciona pra função do controller
 router.post('/send', upload.single('imagem'), sendMessageHandler);
+router.get('/listar-grupos', getGrupoHandle);
 
 module.exports = router;

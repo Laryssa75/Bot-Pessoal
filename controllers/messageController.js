@@ -2,6 +2,25 @@ const { client } = require('../services/whatsappClient');
 const { MessageMedia } = require('whatsapp-web.js');
 const path = require('path');
 
+
+const getGrupoHandle = async(req, res) => {
+    try {
+        const chats = await client.getChats();
+        const grupos = chats.filter(chat => chat.isGroup);
+
+        const grupoInfo = grupos.map(group => ({
+            nome: group.name,
+            id:  group.id._serialized
+        }));
+
+        res.status(200).json(grupoInfo);
+    }catch(error) {
+        console.error('Erro ao listar grupos:', error);
+        res.status(500).send('Erro ao listar grupos');
+    }
+};
+
+
 const sendMessageHandler = async (req, res) => {
     const { numeros, mensagem } = req.body;
     const caminhoImagem = req.file?.path;
@@ -15,7 +34,10 @@ const sendMessageHandler = async (req, res) => {
         const numeroLimpo = numero.replace(/\D/g, '');
 
         // Verifica se o número começa com o código do país e aplica o sufixo @c.us
-        const numeroComSufixo = numeroLimpo.startsWith('55') ? `${numeroLimpo}@c.us` : numeroLimpo;
+        const numeroComSufixo = numero.includes('@')
+            ? numero
+            //use g.us para grupos
+            : (numeroLimpo.startWith('55') ? `${numeroLimpo}@c.us` : `+55${numeroLimpo}@c.us`);
 
         try {
             if (caminhoImagem) {
@@ -32,6 +54,7 @@ const sendMessageHandler = async (req, res) => {
         }
     });
 
+    
     try {
         // Espera todas as promessas de envio de mensagem se resolverem
         await Promise.all(promises);
@@ -41,4 +64,6 @@ const sendMessageHandler = async (req, res) => {
     }
 };
 
-module.exports = { sendMessageHandler };
+
+
+module.exports = { sendMessageHandler, getGrupoHandle };
