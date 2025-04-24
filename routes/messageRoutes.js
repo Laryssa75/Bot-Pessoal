@@ -8,10 +8,21 @@ const storage = multer.diskStorage({
     destination: (req, file, cb) => cb(null, 'uploads/'),
     filename: (req, file, cb) => cb(null, Date.now() + '-' + file.originalname)
 });
+
+const fileFilter = (req, file, cb) => {
+    const allowedTypes =['image/jpeg', 'image/jpg', 'image/png', 'application/pdf'];
+    if(allowedTypes.includes(file.mimetype)) {
+        cb(null, true);
+    }else{
+        cb(new Error('Tipo de arquvivo não permitido.Use JPEG, JPG, PNG OU PDF apenas.'))
+    }
+};
+
+
 const upload = multer({ storage });
 
 // Aqui só redireciona pra função do controller
-router.post('/send', upload.single('imagem'), sendMessageHandler);
+router.post('/send', upload.array('imagem'), sendMessageHandler);
 router.get('/listar-grupos', getGrupoHandle);
 
 module.exports = router;

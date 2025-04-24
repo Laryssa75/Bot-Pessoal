@@ -18,12 +18,14 @@ const getGrupoHandle = async(req, res) => {
         console.error('Erro ao listar grupos:', error);
         res.status(500).send('Erro ao listar grupos');
     }
+
+    //para listar o id dos grupos bastar colocar a url http://localhost:3000/api/listar-grupos
 };
 
 
 const sendMessageHandler = async (req, res) => {
     const { numeros, mensagem } = req.body;
-    const caminhoImagem = req.file?.path;
+    const arquivos = req.files;
 
     // Cria um array com os números, removendo espaços extras
     const numerosArray = numeros.split(',').map(n => n.trim());
@@ -37,17 +39,24 @@ const sendMessageHandler = async (req, res) => {
         const numeroComSufixo = numero.includes('@')
             ? numero
             //use g.us para grupos
-            : (numeroLimpo.startWith('55') ? `${numeroLimpo}@c.us` : `+55${numeroLimpo}@c.us`);
+            : (numeroLimpo.startWith('55') ? `${numeroLimpo}@c.us` : `55${numeroLimpo}@c.us`);
 
         try {
-            if (caminhoImagem) {
-                // Envia a imagem se o caminho da imagem for fornecido
-                const media = MessageMedia.fromFilePath(caminhoImagem);
-                await client.sendMessage(numeroComSufixo, media, { caption: mensagem });
+            if(mensagem) {
+                await client.sendMessage(numeroComSufixo, mensagem);
+            }
+
+            //envia os arquivos individualmente
+            if (arquivos && arquivos.length > 0 ) {
+                for (const arquivo of arquivos){
+                    const media = MessageMedia.fromFilePath(arquivo.path);
+                    await client.sendMessage(numeroComSufixo, media);
+                }
             } else {
                 // Envia apenas a mensagem de texto
                 await client.sendMessage(numeroComSufixo, mensagem);
             }
+
             console.log(`Mensagem enviada para ${numeroComSufixo}`);
         } catch (error) {
             console.error(`Erro ao enviar para ${numeroComSufixo}:`, error);

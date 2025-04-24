@@ -16,7 +16,7 @@
 
   <hr>
 
-  <form id="message-form" enctype="multipart/form-data">
+  <form action="/api/send" id="message-form" enctype="multipart/form-data">
     <label for="numeros">Números de celular(separados por vírgula):</label>
     <input type="text" name="numeros" required placeholder="Ex: 5599999999999,5588888888888"><br>
 
@@ -24,7 +24,7 @@
     <textarea name="mensagem" required></textarea><br>
 
     <label for="imagem">Imagem (opcional):</label>
-    <input type="file" name="imagem" accept="image/*"><br>
+    <input type="file" name="arquivos" multiple><br>
 
     <button type="submit">Enviar Mensagem</button>
   </form>
