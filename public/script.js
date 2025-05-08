@@ -21,12 +21,31 @@ form.addEventListener('submit', async e => {
   e.preventDefault();
   const formData = new FormData(form);
 
+  try{
   const res = await fetch('/api/send', {
     method: 'POST',
     body: formData
   });
 
-  const text = await res.text();
-  alert(text);
+  const data = await res.json(); //recebe a resposta do json
+
+  alert(data, mensagem);//exibe os status geral da operação
+
+  //Se houver erros específicos, mostra
+  const erros = data.resultados
+    ?.filter(r => r.status === 'erro');
+  if (erros ?.length) {
+    const msgErro = erros.map(e => `${e.numero}: ${e.erro}`).join('\n');
+    alert('Erros no envio :\n\n' + msgErro);
+  }
+
+  }catch (err){
+    alert('❌ Erro ao enviar requisição: ' + err.message);
+  }
+
   form.reset();
+
+  // const text = await res.text();
+  // alert(text);
+  // form.reset();
 });

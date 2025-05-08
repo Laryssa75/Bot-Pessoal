@@ -26,53 +26,62 @@ const getGrupoHandle = async(req, res) => {
 const sendMessageHandler = async (req, res) => {
     const { numeros, mensagem } = req.body;
     const arquivos = req.files;
-
-    // Cria um array com os números, removendo espaços extras
+  
     const numerosArray = numeros.split(',').map(n => n.trim());
-
-    // Cria um array de promessas
-    const promises = numerosArray.map(async (numero) => {
-        // Limpeza do número (remover tudo o que não for número, incluindo espaços)
-        const numeroLimpo = numero.replace(/\D/g, '');
-
-        // Verifica se o número começa com o código do país e aplica o sufixo @c.us
-        const numeroComSufixo = numero.includes('@')
-            ? numero
-            //use g.us para grupos
-            : (numeroLimpo.startWith('55') ? `${numeroLimpo}@c.us` : `55${numeroLimpo}@c.us`);
-
-        try {
-            if(mensagem) {
-                await client.sendMessage(numeroComSufixo, mensagem);
-            }
-
-            //envia os arquivos individualmente
-            if (arquivos && arquivos.length > 0 ) {
-                for (const arquivo of arquivos){
-                    const media = MessageMedia.fromFilePath(arquivo.path);
-                    await client.sendMessage(numeroComSufixo, media);
-                }
-            } else {
-                // Envia apenas a mensagem de texto
-                await client.sendMessage(numeroComSufixo, mensagem);
-            }
-
-            console.log(`Mensagem enviada para ${numeroComSufixo}`);
-        } catch (error) {
-            console.error(`Erro ao enviar para ${numeroComSufixo}:`, error);
+  
+    const envioMensagem = numerosArray.map(async (numero) => {
+      const numeroLimpo = numero.replace(/\D/g, '');
+      const numeroComSufixo = numero.includes('@')
+        ? numero
+        : (numeroLimpo.startsWith('55') ? `${numeroLimpo}@c.us` : `55${numeroLimpo}@c.us`);
+  
+      try {
+        // Envia arquivos, se houver
+        if (arquivos?.length) {
+          for (const arquivo of arquivos) {
+            const media = MessageMedia.fromFilePath(arquivo.path);
+            await client.sendMessage(numeroComSufixo, media);
+          }
         }
+  
+        // Envia mensagem de texto
+        if (mensagem) {
+          await client.sendMessage(numeroComSufixo, mensagem);
+        }
+  
+        return { numero: numeroComSufixo, status: 'sucesso' };
+  
+      } catch (error) {
+        return {
+          numero: numeroComSufixo,
+          status: 'erro',
+          erro: error.message || 'Erro desconhecido'
+        };
+      }
     });
-
-    
-    try {
-        // Espera todas as promessas de envio de mensagem se resolverem
-        await Promise.all(promises);
-        res.status(200).send('Mensagens enviadas com sucesso!');
-    } catch (error) {
-        res.status(500).send('Erro ao enviar mensagens');
-    }
-};
-
+  
+    const resultadosBrutos = await Promise.allSettled(envioMensagem);
+  
+    const resultados = resultadosBrutos.map((r, i) =>
+      r.status === 'fulfilled'
+        ? r.value
+        : {
+            numero: numerosArray[i],
+            status: 'erro',
+            erro: r.reason?.message || 'Erro inesperado'
+          }
+    );
+  
+    const houveErros = resultados.some(r => r.status === 'erro');
+  
+    res.status(houveErros ? 207 : 200).json({
+      mensagem: houveErros
+        ? 'Algumas mensagens não foram enviadas.'
+        : 'Todas as mensagens foram enviadas com sucesso!',
+      resultados
+    });
+  };
+  
 
 
 module.exports = { sendMessageHandler, getGrupoHandle };

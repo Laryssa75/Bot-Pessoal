@@ -22,7 +22,7 @@ const fileFilter = (req, file, cb) => {
 const upload = multer({ storage });
 
 // Aqui só redireciona pra função do controller
-router.post('/send', upload.array('imagem'), sendMessageHandler);
+router.post('/send', upload.array('arquivos'), sendMessageHandler);
 router.get('/listar-grupos', getGrupoHandle);
 
 module.exports = router;

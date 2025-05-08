@@ -41,4 +41,4 @@ server.listen(PORT,  () => {
 });
 
 
-//rodar na web para testar: http://localhost:3000/uploads
+//rodar na web para testar: http://localhost:3000
