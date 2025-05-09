@@ -29,28 +29,27 @@ const sendMessageHandler = async (req, res) => {
   
     const numerosArray = numeros.split(',').map(n => n.trim());
   
-    const envioMensagem = numerosArray.map(async (numero) => {
+    const tarefasEnvio = numerosArray.map(async (numero) => {
       const numeroLimpo = numero.replace(/\D/g, '');
       const numeroComSufixo = numero.includes('@')
         ? numero
         : (numeroLimpo.startsWith('55') ? `${numeroLimpo}@c.us` : `55${numeroLimpo}@c.us`);
   
       try {
-        // Envia arquivos, se houver
+        // Envia arquivos (se existirem)
         if (arquivos?.length) {
           for (const arquivo of arquivos) {
-            const media = MessageMedia.fromFilePath(arquivo.path);
+            const media = MessageMedia.fromFilePath(path.resolve(arquivo.path));
             await client.sendMessage(numeroComSufixo, media);
           }
         }
   
-        // Envia mensagem de texto
+        // Envia mensagem de texto (se houver)
         if (mensagem) {
           await client.sendMessage(numeroComSufixo, mensagem);
         }
   
         return { numero: numeroComSufixo, status: 'sucesso' };
-  
       } catch (error) {
         return {
           numero: numeroComSufixo,
@@ -60,28 +59,19 @@ const sendMessageHandler = async (req, res) => {
       }
     });
   
-    const resultadosBrutos = await Promise.allSettled(envioMensagem);
+    const resultadosBrutos = await Promise.allSettled(tarefasEnvio);
   
-    const resultados = resultadosBrutos.map((r, i) =>
-      r.status === 'fulfilled'
-        ? r.value
-        : {
-            numero: numerosArray[i],
-            status: 'erro',
-            erro: r.reason?.message || 'Erro inesperado'
-          }
-    );
-  
-    const houveErros = resultados.some(r => r.status === 'erro');
-  
-    res.status(houveErros ? 207 : 200).json({
-      mensagem: houveErros
-        ? 'Algumas mensagens não foram enviadas.'
-        : 'Todas as mensagens foram enviadas com sucesso!',
-      resultados
+    const resultados = resultadosBrutos.map((resultado, i) => {
+      if (resultado.status === 'fulfilled') {
+        return resultado.value;
+      }
+      return {
+        numero: numerosArray[i],
+        status: 'erro',
+        erro: resultado.reason?.message || 'Erro inesperado'
+      };
     });
-  };
   
 
-
+};
 module.exports = { sendMessageHandler, getGrupoHandle };

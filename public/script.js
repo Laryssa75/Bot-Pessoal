@@ -29,21 +29,20 @@ form.addEventListener('submit', async e => {
 
   const data = await res.json(); //recebe a resposta do json
 
-  alert(data, mensagem);//exibe os status geral da operação
+  alert(data.mensagem || 'Mensagem enviada com sucesso!');
 
   //Se houver erros específicos, mostra
   const erros = data.resultados
     ?.filter(r => r.status === 'erro');
   if (erros ?.length) {
     const msgErro = erros.map(e => `${e.numero}: ${e.erro}`).join('\n');
-    alert('Erros no envio :\n\n' + msgErro);
+    alert('❌ Erros no envio :\n\n' + msgErro);
   }
 
-  }catch (err){
+  form.reset(); // <- dentro do try, apenas se deu tudo certo
+  } catch (err) {
     alert('❌ Erro ao enviar requisição: ' + err.message);
   }
-
-  form.reset();
 
   // const text = await res.text();
   // alert(text);

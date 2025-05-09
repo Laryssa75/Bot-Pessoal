@@ -19,7 +19,7 @@ const fileFilter = (req, file, cb) => {
 };
 
 
-const upload = multer({ storage });
+const upload = multer({ storage, fileFilter });
 
 // Aqui só redireciona pra função do controller
 router.post('/send', upload.array('arquivos'), sendMessageHandler);
